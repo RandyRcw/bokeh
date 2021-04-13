@@ -32,6 +32,7 @@ from ..core.properties import (
     Tuple,
 )
 from ..models import ColumnDataSource, GraphRenderer, Plot, Title, Tool, glyphs
+from ..models.dom import Template
 from ..models.tools import Drag, InspectTool, Scroll, Tap
 from ..transform import linear_cmap
 from ..util.options import Options
@@ -1661,7 +1662,7 @@ class FigureOptions(Options):
     The type of the y-axis.
     """)
 
-    tooltips = Either(Null, String, List(Tuple(String, String)), help="""
+    tooltips = Either(Null, Instance(Template), String, List(Tuple(String, String)), help="""
     An optional argument to configure tooltips for the Figure. This argument
     accepts the same values as the ``HoverTool.tooltips`` property. If a hover
     tool is specified in the ``tools`` argument, this value will override that

@@ -93,6 +93,7 @@ from ..util.deprecation import deprecated
 from ..util.string import nice_join
 from .annotations import BoxAnnotation, PolyAnnotation
 from .callbacks import Callback
+from .dom import Template
 from .glyphs import Line, LineGlyph, MultiLine, Patches, Rect, XYGlyph
 from .layouts import LayoutDOM
 from .ranges import Range1d
@@ -1049,7 +1050,7 @@ class HoverTool(InspectTool):
     :geometry: object containing the coordinates of the hover cursor
     """)
 
-    tooltips = Either(Null, String, List(Tuple(String, String)),
+    tooltips = Either(Null, Instance(Template), String, List(Tuple(String, String)),
             default=[
                 ("index","$index"),
                 ("data (x, y)","($x, $y)"),

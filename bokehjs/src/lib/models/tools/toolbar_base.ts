@@ -54,6 +54,7 @@ export class ToolbarViewModel extends Model {
 
 export class ToolbarBaseView extends DOMView {
   model: ToolbarBase
+  el: HTMLElement
 
   protected _tool_button_views: Map<ButtonTool, ButtonToolButtonView>
   protected _toolbar_view_model: ToolbarViewModel

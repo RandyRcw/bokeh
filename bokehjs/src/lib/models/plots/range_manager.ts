@@ -73,6 +73,8 @@ export class RangeManager {
       const renderer_view = this.parent.renderer_view(renderer)
       if (renderer_view == null)
         continue
+      if (!renderer_view.visible)
+        continue
 
       const bds = renderer_view.glyph_view.bounds()
       if (bds != null)

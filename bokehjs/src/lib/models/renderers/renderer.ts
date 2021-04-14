@@ -8,6 +8,29 @@ import type {Plot, PlotView} from "../plots/plot"
 import type {CanvasView} from "../canvas/canvas"
 import {CoordinateTransform} from "../canvas/coordinates"
 
+export namespace RendererGroup {
+  export type Attrs = p.AttrsOf<Props>
+  export type Props = Model.Props & {
+    visible: p.Property<boolean>
+  }
+}
+
+export interface RendererGroup extends RendererGroup.Attrs {}
+
+export class RendererGroup extends Model {
+  properties: RendererGroup.Props
+
+  constructor(attrs?: Partial<RendererGroup.Attrs>) {
+    super(attrs)
+  }
+
+  static init_RendererGroup(): void {
+    this.define<RendererGroup.Props>(({Boolean}) => ({
+      visible: [ Boolean, true ],
+    }))
+  }
+}
+
 export abstract class RendererView extends View implements visuals.Renderable {
   model: Renderer
   visuals: Renderer.Visuals
@@ -84,8 +107,13 @@ export abstract class RendererView extends View implements visuals.Renderable {
     return false
   }
 
+  get visible(): boolean {
+    const {visible, group} = this.model
+    return !visible ? false : (group?.visible ?? true)
+  }
+
   render(): void {
-    if (this.model.visible) {
+    if (this.visible) {
       this._render()
     }
     this._has_finished = true
@@ -102,6 +130,7 @@ export namespace Renderer {
   export type Attrs = p.AttrsOf<Props>
 
   export type Props = Model.Props & {
+    group: p.Property<RendererGroup | null>
     level: p.Property<RenderLevel>
     visible: p.Property<boolean>
     x_range_name: p.Property<string>
@@ -122,7 +151,8 @@ export abstract class Renderer extends Model {
   }
 
   static init_Renderer(): void {
-    this.define<Renderer.Props>(({Boolean, String}) => ({
+    this.define<Renderer.Props>(({Boolean, String, Ref, Nullable}) => ({
+      group:        [ Nullable(Ref(RendererGroup)), null ],
       level:        [ RenderLevel, "image" ],
       visible:      [ Boolean, true ],
       x_range_name: [ String, "default" ],

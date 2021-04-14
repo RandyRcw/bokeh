@@ -61,6 +61,7 @@ __all__ = (
     'GraphRenderer',
     'GuideRenderer',
     'Renderer',
+    'RendererGroup',
     'TileRenderer',
 )
 
@@ -71,6 +72,15 @@ __all__ = (
 #-----------------------------------------------------------------------------
 # Dev API
 #-----------------------------------------------------------------------------
+
+class RendererGroup(Model):
+    '''A collection of renderers.
+
+    '''
+
+    visible = Bool(default=True, help="""
+    Makes all groupped renderers visible or not.
+    """)
 
 @abstract
 class Renderer(Model):
@@ -95,6 +105,8 @@ class Renderer(Model):
     A particular (named) y-range to use for computing screen locations when
     rendering glyphs on the plot. If unset, use the default y-range.
     """)
+
+    group = Nullable(Instance(RendererGroup))
 
 class TileRenderer(Renderer):
     '''

@@ -64,22 +64,33 @@ TOOLTIPS = [
 
 from math import sin, cos, radians
 import numpy as np
+from bokeh.models.renderers import RendererGroup
 def f():
     fs = []
+    bohr_diagram = figure(
+        #x_range=(-n-e, n+e), y_range=(-n-e, n+e),
+        width=150, height=150,
+        x_axis_type=None, y_axis_type=None,
+        toolbar_location=None, outline_line_color=None,
+        match_aspect=True,
+    )
+    groups = []
     for sc in df["electron shells"]:
         n = len(sc)
         e = 0.2
-        bohr_diagram = figure(
-            x_range=(-n-e, n+e), y_range=(-n-e, n+e),
-            width=200, height=200,
-            x_axis_type=None, y_axis_type=None,
-            toolbar_location=None, outline_line_color=None,
-        )
+        #bohr_diagram = figure(
+        #    x_range=(-n-e, n+e), y_range=(-n-e, n+e),
+        #    width=150, height=150,
+        #    x_axis_type=None, y_axis_type=None,
+        #    toolbar_location=None, outline_line_color=None,
+        #)
         #sc = [2, 8, 18, 32, 32, 18, 8]
         # shells
-        #g = RendererGroup()
+        group = RendererGroup(visible=False)
+        groups.append(group)
         #print(sc)
-        bohr_diagram.circle(x=0, y=0, radius=list(range(1, n+1)), fill_color=None, line_color="black")
+        c0 = bohr_diagram.circle(x=0, y=0, radius=list(range(1, n+1)), fill_color=None, line_color="black", visible=False)
+        c0.group = group
         # electrons
         xs = np.array([])
         ys = np.array([])
@@ -93,15 +104,19 @@ def f():
             ys = np.append(ys, y)
             #bohr_diagram.circle(x=x, y=y)
             #bohr_diagram.polar.circle(r=i+1, phi=list(range(0, 360, da)), phi_units="deg")
-        bohr_diagram.circle(x=xs, y=ys)
-        fs.append(bohr_diagram)
+        c1 = bohr_diagram.circle(x=xs, y=ys, visible=False)
+        c1.group = group
+        #fs.append(bohr_diagram)
 #f()
-    return fs
+    #group.visible = True
+    return bohr_diagram, groups
+    #return fs
 
-from bokeh.models.dom import Style, Template, Table, TableRow, Div, Span, Index, ValueRef, ColorRef, CollectionRef, VBox
+from bokeh.models.dom import Style, Template, ToggleGroup, Table, TableRow, Div, Span, Index, ValueRef, ColorRef, VBox
 
 def g():
-    bohr_diagram = f()
+    #bohr_diagrams = f()
+    bohr_diagram, groups = f()
 
     #grid = Div(style=dict(display="grid", grid_template_columns="auto auto", column_gap="10px"))
     style = Style(
@@ -109,7 +124,13 @@ def g():
         grid_template_columns="auto auto",
         column_gap="10px",
     )
+    #style1 = Style(
+    #    display="grid",
+    #    grid_template_columns="auto auto auto auto auto auto",
+    #    column_gap="10px",
+    #)
     grid = Div(style=style)
+    #grid.tags = [bohr_diagrams]
     grid.children = [
         Span(),                     Span(children=["#", Index()]),
         "Name",                     Span(style=dict(font_weight="bold"), children=[ValueRef(field="name")]),
@@ -118,9 +139,9 @@ def g():
         "Type",                     ValueRef(field="metal"),
         "CPK color",                ColorRef(field="CPK", hex=True, swatch=True),
         "Electronic configuration", ValueRef(field="electronic configuration"),
-        Span(),                     bohr_diagram[25],
+        Span(),                     bohr_diagram, #bohr_diagrams[0], #Div(style=style1, children=bohr_diagrams)
     ]
-    return Template(children=[grid])
+    return Template(children=[grid], actions=[ToggleGroup(groups=groups)])
 
     """
     _TOOLTIPS = Table(children=[
